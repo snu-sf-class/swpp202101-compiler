@@ -9,6 +9,7 @@
 #include "llvm/AsmParser/Parser.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Support/raw_os_ostream.h"
+#include "llvm/Support/CommandLine.h"
 #include "llvm/IR/PassManager.h"
 
 #include <string>
@@ -16,11 +17,21 @@
 using namespace std;
 using namespace llvm;
 
+static cl::OptionCategory optCategory("SWPP Compiler options");
+
+static cl::opt<string> optInput(
+    cl::Positional, cl::desc("<input bitcode file>"), cl::Required,
+    cl::value_desc("filename"), cl::cat(optCategory));
+
+static cl::opt<string> optOutput(
+    "o", cl::desc("output assembly file"), cl::cat(optCategory),
+    cl::init(""));
+
 int main(int argc, char *argv[]) {
   //Parse command line arguments
-  if(argc!=3) return -1;
-  string optInput = argv[1];
-  string optOutput = argv[2];
+  cl::ParseCommandLineOptions(argc, argv);
+  if (optOutput == "")
+    optOutput = "a.s";
   bool optPrintProgress = false;
 
   //Parse input LLVM IR module
